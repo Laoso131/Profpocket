@@ -1,45 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
-  <title>Dashboard - ProPocket AI</title>
-  <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<title>Dashboard - ProfPocket AI</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div class="dashboard">
+<div class="container">
 
-  <h1>📊 Dashboard</h1>
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-  <div class="card">
-    👤 User: {{ user }}
-  </div>
+<h3>Dashboard</h3>
 
-  <div class="card">
-    💎 Plan: {{ plan }}
-  </div>
+<a href="/">💬 Chat IA</a>
+<a href="/dashboard">📊 Dashboard</a>
+<a href="/admin">👑 Admin</a>
+<a href="/logout">🚪 Déconnexion</a>
 
-  <div class="card">
-    ⚡ Upgrade Pro AI
-    <a href="/subscribe">
-      <button>Go Premium</button>
-    </a>
-  </div>
+</div>
 
-  <div class="card">
-    🤖 Features:
-    <ul>
-      <li>Streaming AI</li>
-      <li>Chat History</li>
-      <li>PDF (future)</li>
-      <li>Image AI (future)</li>
-    </ul>
-  </div>
+<!-- CONTENT -->
+<div class="chat">
 
-  <a href="/">
-    <button>Go to Chat</button>
-  </a>
+<div class="chat-box">
+
+<h2>👤 Mon compte</h2>
+
+<div class="msg ai">
+Utilisateur : <b>{{ user }}</b>
+</div>
+
+<div class="msg ai">
+Statut : <b style="color:#00ff9d;">Free</b>
+</div>
+
+<div class="msg ai">
+Crédits IA : <b>∞ (beta)</b>
+</div>
+
+<div class="msg ai">
+Abonnement : <b>Aucun</b>
+</div>
+
+</div>
+
+</div>
 
 </div>
 
