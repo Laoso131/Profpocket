@@ -154,3 +154,63 @@ button:hover {
   padding: 8px;
   font-style: italic;
 }
+.login-box {
+  width: 320px;
+  margin: 100px auto;
+  padding: 25px;
+  background: rgba(17,17,17,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.login-box input {
+  width: 90%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: white;
+}
+
+.login-box button {
+  width: 95%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #00ffcc, #3b82f6);
+  font-weight: bold;
+}
+
+/* MESSAGE BASE */
+#msg {
+  margin-top: 12px;
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: 0.3s ease;
+}
+
+/* SUCCESS */
+#msg.success {
+  background: rgba(0,255,150,0.1);
+  border: 1px solid #00ff9d;
+  color: #00ff9d;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ERROR */
+#msg.error {
+  background: rgba(255,0,80,0.1);
+  border: 1px solid #ff4d6d;
+  color: #ff4d6d;
+  opacity: 1;
+  transform: translateY(0);
+}
