@@ -1,70 +1,29 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
-<meta charset="utf-8">
-
-<title>ProfPocket</title>
-
-<link
-rel="stylesheet"
-href="/static/style.css">
-
+    <title>ProfPocket</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<header>
+<div class="container">
 
-<h1>ProfPocket</h1>
+    <header>
+        <h1>⚡ ProfPocket IA</h1>
+        <p>Ton assistant de révision intelligent</p>
+    </header>
 
-<a href="/login">
+    <div id="chat-box" class="chat-box"></div>
 
-Connexion
-
-</a>
-
-</header>
-
-<div class="chat">
-
-<div id="messages">
+    <div class="input-area">
+        <input id="msg" placeholder="Pose ta question (maths, physique...)" />
+        <button onclick="send()">Envoyer 🚀</button>
+    </div>
 
 </div>
 
-<input
-id="message"
-placeholder="Pose ta question">
-
-<button
-onclick="sendMessage()">
-
-Envoyer
-
-</button>
-
-<br><br>
-
-<input
-type="file"
-id="photo">
-
-<button
-onclick="sendPhoto()">
-
-Envoyer photo
-
-</button>
-
-</div>
-
-<script
-src="/static/script.js">
-
-</script>
+<script src="/static/script.js"></script>
 
 </body>
-
 </html>
