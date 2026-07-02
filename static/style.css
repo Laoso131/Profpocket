@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 body {
   margin: 0;
-  font-family: Arial;
-  background: #0b0b0b;
-  color: white;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #000000);
+  color: #e5e7eb;
 }
 
+/* APP LAYOUT */
 .app {
   display: flex;
   height: 100vh;
@@ -12,94 +15,142 @@ body {
 
 /* SIDEBAR */
 .sidebar {
-  width: 260px;
-  background: #111;
-  padding: 15px;
+  width: 280px;
+  background: linear-gradient(180deg, #0b1220, #070b14);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* LOGO */
 .logo {
   font-size: 20px;
-  color: #00ff9d;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #00ffcc, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
+/* BUTTONS SIDEBAR */
 .sidebar button {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: white;
-  padding: 10px;
-  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #e5e7eb;
+  padding: 12px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
 }
 
 .sidebar button:hover {
-  border-color: #00ff9d;
+  background: rgba(0,255,204,0.08);
+  border-color: #00ffcc;
+  transform: translateX(2px);
 }
 
+/* PREMIUM BOX */
 .premium {
   margin-top: auto;
-  padding: 10px;
-  background: linear-gradient(45deg, #00ff9d, #00b3ff);
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00ffcc, #3b82f6);
   color: black;
-  border-radius: 10px;
+  font-weight: 600;
 }
 
-/* MAIN */
+/* MAIN AREA */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: radial-gradient(circle at bottom, #0b1220, #000);
 }
 
-/* CHAT */
+/* CHAT AREA */
 .chat {
   flex: 1;
-  padding: 20px;
+  padding: 24px;
   overflow-y: auto;
 }
 
+/* MESSAGE CARDS */
 .msg {
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 10px;
   max-width: 70%;
+  padding: 14px 16px;
+  margin: 10px 0;
+  border-radius: 16px;
+  line-height: 1.5;
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-in;
 }
 
+/* USER */
 .user {
-  background: #1f1f1f;
   margin-left: auto;
+  background: linear-gradient(135deg, #1f2937, #111827);
 }
 
+/* BOT */
 .bot {
-  background: #151515;
-  border-left: 3px solid #00ff9d;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  border-left: 3px solid #00ffcc;
 }
 
-/* INPUT */
+/* INPUT BAR */
 .inputbar {
   display: flex;
-  padding: 10px;
-  border-top: 1px solid #222;
+  padding: 14px;
+  gap: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
 }
 
 input {
   flex: 1;
-  padding: 12px;
-  background: #111;
-  border: 1px solid #333;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
   color: white;
-  border-radius: 8px;
+  outline: none;
 }
 
+input:focus {
+  border-color: #00ffcc;
+  box-shadow: 0 0 10px rgba(0,255,204,0.2);
+}
+
+/* BUTTON SEND */
 button {
-  margin-left: 10px;
-  background: #00ff9d;
+  padding: 14px 18px;
+  border-radius: 14px;
   border: none;
-  padding: 12px 18px;
-  border-radius: 8px;
   cursor: pointer;
+  background: linear-gradient(135deg, #00ffcc, #3b82f6);
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FOOTER SIGNATURE */
+.signature {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.5;
+  padding: 8px;
+  font-style: italic;
 }
