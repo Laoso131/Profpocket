@@ -220,3 +220,32 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+@app.route("/create-checkout-session/<plan>")
+def checkout(plan):
+
+    if plan == "pro":
+        price_id = "price_pro_id"
+    elif plan == "ultra":
+        price_id = "price_ultra_id"
+    else:
+        return "Plan invalide"
+
+    session_stripe = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        mode="subscription",
+        line_items=[{
+            "price": price_id,
+            "quantity": 1
+        }],
+        success_url="http://localhost:5000/success",
+        cancel_url="http://localhost:5000/cancel"
+    )
+
+    return redirect(session_stripe.url)
+    @app.route("/success")
+def success():
+    return "Paiement réussi ✅ Bienvenue dans Pro"
+
+@app.route("/cancel")
+def cancel():
+    return "Paiement annulé ❌"
