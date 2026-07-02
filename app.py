@@ -10,8 +10,7 @@ app.secret_key = "change_me"
 def home():
     if "user" not in session:
         return redirect("/login")
-    return "<h1>HOME OK</h1>"
-
+    return render_template("index.html", user=session["user"])
 # ======================
 # LOGIN PAGE (GET)
 # ======================
