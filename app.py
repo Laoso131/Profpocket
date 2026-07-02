@@ -9,6 +9,26 @@ app.secret_key = "CHANGE_ME_SUPER_SECRET_KEY"
 # DATABASE INIT
 # ======================
 def init_db():
+    def create_admin():
+    conn = sqlite3.connect("profpocket.db")
+    c = conn.cursor()
+
+    from werkzeug.security import generate_password_hash
+
+    # check si admin existe déjà
+    c.execute("SELECT * FROM users WHERE username=?", ("admin",))
+    if not c.fetchone():
+
+        c.execute(
+            "INSERT INTO users(username,password,role) VALUES(?,?,?)",
+            ("admin", generate_password_hash("admin123"), "admin")
+        )
+
+        conn.commit()
+
+    conn.close()
+
+create_admin()
     conn = sqlite3.connect("profpocket.db")
     c = conn.cursor()
 
