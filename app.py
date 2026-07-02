@@ -1,19 +1,24 @@
-from flask import Flask, request, jsonify, session, render_template, redirect
+from flask import Flask, request, jsonify, session, render_template, redirect, Response
 import sqlite3
 import openai
 import stripe
+import time
+import json
 
 app = Flask(__name__)
-app.secret_key = "PROPOCKET_SECRET_CHANGE_ME"
+app.secret_key = "CHANGE_ME_SUPER_SECRET"
 
 # ======================
-# API KEYS (REMPLACE)
+# KEYS
 # ======================
 openai.api_key = "OPENAI_KEY"
-stripe.api_key = "STRIPE_KEY"
+stripe.api_key = "STRIPE_SECRET_KEY"
+
+# Stripe product (à créer dans Stripe dashboard)
+PRICE_ID = "price_xxxxxxxxxxxxx"
 
 # ======================
-# DB INIT
+# DB
 # ======================
 def init_db():
     conn = sqlite3.connect("db.db")
@@ -23,7 +28,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
-        password TEXT
+        password TEXT,
+        plan TEXT DEFAULT 'free'
     )
     """)
 
@@ -42,34 +48,13 @@ def init_db():
 init_db()
 
 # ======================
-# AUTH CHECK
+# AUTH
 # ======================
 def logged():
     return "user" in session
 
 # ======================
-# REGISTER
-# ======================
-@app.route("/register", methods=["POST"])
-def register():
-    data = request.get_json()
-    u = data["username"]
-    p = data["password"]
-
-    conn = sqlite3.connect("db.db")
-    c = conn.cursor()
-
-    try:
-        c.execute("INSERT INTO users VALUES (NULL,?,?)", (u,p))
-        conn.commit()
-    except:
-        return jsonify({"msg":"exists"})
-
-    conn.close()
-    return jsonify({"msg":"created"})
-
-# ======================
-# LOGIN
+# LOGIN / REGISTER (simple)
 # ======================
 @app.route("/login", methods=["POST"])
 def login():
@@ -82,6 +67,7 @@ def login():
 
     c.execute("SELECT * FROM users WHERE username=? AND password=?", (u,p))
     user = c.fetchone()
+
     conn.close()
 
     if user:
@@ -89,13 +75,23 @@ def login():
         return jsonify({"msg":"ok"})
     return jsonify({"msg":"error"})
 
-# ======================
-# LOGOUT
-# ======================
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/login")
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    u = data["username"]
+    p = data["password"]
+
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+
+    try:
+        c.execute("INSERT INTO users (username,password) VALUES (?,?)", (u,p))
+        conn.commit()
+    except:
+        return jsonify({"msg":"exists"})
+
+    conn.close()
+    return jsonify({"msg":"created"})
 
 # ======================
 # HOME
@@ -113,100 +109,81 @@ def home():
 def dashboard():
     if not logged():
         return redirect("/login")
-    return render_template("dashboard.html", user=session["user"])
-
-# ======================
-# 🧠 AI (OPENROUTER / OPENAI READY)
-# ======================
-def ai_response(msg):
-
-    # fallback local
-    if "math" in msg.lower():
-        return "📘 Maths: f(x)=x² → f'(x)=2x"
-
-    try:
-        # ⚠️ remplace model si besoin
-        res = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":msg}]
-        )
-        return res["choices"][0]["message"]["content"]
-
-    except:
-        return "⚠️ IA offline (ajoute ta clé OpenAI)"
-
-# ======================
-# CHAT
-# ======================
-@app.route("/chat", methods=["POST"])
-def chat():
-
-    if not logged():
-        return jsonify({"reply":"not logged"})
-
-    data = request.get_json()
-    msg = data["message"]
-
-    reply = ai_response(msg)
 
     conn = sqlite3.connect("db.db")
     c = conn.cursor()
 
-    c.execute(
-        "INSERT INTO messages VALUES (NULL,?,?,?)",
-        (session["user"], "user", msg)
-    )
-    c.execute(
-        "INSERT INTO messages VALUES (NULL,?,?,?)",
-        (session["user"], "ai", reply)
-    )
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"reply": reply})
-
-# ======================
-# HISTORY
-# ======================
-@app.route("/history")
-def history():
-
-    if not logged():
-        return jsonify([])
-
-    conn = sqlite3.connect("db.db")
-    c = conn.cursor()
-
-    c.execute("SELECT role, content FROM messages WHERE user=?", (session["user"],))
-    data = c.fetchall()
+    c.execute("SELECT plan FROM users WHERE username=?", (session["user"],))
+    plan = c.fetchone()
 
     conn.close()
 
-    return jsonify([{"role":r,"content":c} for r,c in data])
+    return render_template("dashboard.html",
+        user=session["user"],
+        plan=plan[0] if plan else "free"
+    )
 
 # ======================
-# STRIPE (PREMIUM READY)
+# STRIPE CHECKOUT
 # ======================
-@app.route("/create-checkout-session")
-def checkout():
+@app.route("/subscribe")
+def subscribe():
 
-    session_stripe = stripe.checkout.Session.create(
+    checkout = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[{
-            "price_data": {
-                "currency": "usd",
-                "product_data": {"name": "ProPocket AI Premium"},
-                "unit_amount": 500,
-            },
+            "price": PRICE_ID,
             "quantity": 1,
         }],
-        mode="payment",
+        mode="subscription",
         success_url="http://localhost:5000/dashboard",
         cancel_url="http://localhost:5000/dashboard",
     )
 
-    return redirect(session_stripe.url)
+    return redirect(checkout.url)
+
+# ======================
+# STREAMING AI (CHATGPT STYLE)
+# ======================
+@app.route("/stream", methods=["POST"])
+def stream():
+
+    if not logged():
+        return "not logged"
+
+    data = request.get_json()
+    msg = data["message"]
+
+    def generate():
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role":"user","content":msg}],
+                stream=True
+            )
+
+            for chunk in response:
+                if "content" in chunk["choices"][0]["delta"]:
+                    token = chunk["choices"][0]["delta"]["content"]
+                    yield f"data: {json.dumps(token)}\n\n"
+                    time.sleep(0.01)
+
+        except:
+            yield "data: error\n\n"
+
+    return Response(generate(), mimetype="text/event-stream")
+
+# ======================
+# CHAT NORMAL (fallback)
+# ======================
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    data = request.get_json()
+    msg = data["message"]
+
+    return jsonify({"reply": "Use streaming endpoint /stream"})
 
 # ======================
 # RUN
