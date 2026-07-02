@@ -20,14 +20,8 @@ async function send() {
 
 function addMsg(type, text) {
   document.getElementById("chat").innerHTML += `
-    <div class="msg ${type}">
-      ${text}
-    </div>
+    <div class="msg ${type}">${text}</div>
   `
-}
-
-function newChat() {
-  document.getElementById("chat").innerHTML = ""
 }
 
 async function loadHistory() {
@@ -36,8 +30,12 @@ async function loadHistory() {
 
   document.getElementById("chat").innerHTML = ""
 
-  data.reverse().forEach(m => {
-    addMsg("user", m[1])
-    addMsg("bot", m[2])
+  data.forEach(m => {
+    addMsg("user", m[0])
+    addMsg("bot", m[1])
   })
+}
+
+function newChat() {
+  document.getElementById("chat").innerHTML = ""
 }
