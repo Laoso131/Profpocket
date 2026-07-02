@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ProfPocket</title>
+    <title>ProfPocket SaaS</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -9,17 +9,23 @@
 
 <div class="container">
 
-    <header>
-        <h1>⚡ ProfPocket IA</h1>
-        <p>Ton assistant de révision intelligent</p>
-    </header>
+    <h1>⚡ ProfPocket SaaS</h1>
 
-    <div id="chat-box" class="chat-box"></div>
-
-    <div class="input-area">
-        <input id="msg" placeholder="Pose ta question (maths, physique...)" />
-        <button onclick="send()">Envoyer 🚀</button>
+    <!-- LOGIN -->
+    <div class="auth">
+        <input id="u" placeholder="username">
+        <input id="p" placeholder="password" type="password">
+        <button onclick="register()">Register</button>
+        <button onclick="login()">Login</button>
     </div>
+
+    <hr>
+
+    <!-- CHAT -->
+    <div id="chat"></div>
+
+    <input id="msg" placeholder="Pose une question">
+    <button onclick="send()">Envoyer</button>
 
 </div>
 
