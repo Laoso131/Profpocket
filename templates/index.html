@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>AI SaaS</title>
+  <title>ProPocket AI</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -12,25 +12,44 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="logo">⚡ AI SaaS</div>
 
-    <button onclick="newChat()">+ New chat</button>
-    <button onclick="loadHistory()">📜 History</button>
-
-    <div class="premium">
-      💎 Premium AI
-      <p>Fast + Smart + Unlimited</p>
+    <div class="logo">
+      ⚡ ProPocket AI
     </div>
+
+    <button onclick="newChat()">+ New Chat</button>
+    <button onclick="loadHistory()">📜 History</button>
+    <button onclick="clearChat()">🗑 Clear</button>
+
+    <div class="account">
+      👤 {{ user }}
+    </div>
+
+    <a href="/logout">
+      <button class="logout">Logout</button>
+    </a>
+
   </div>
 
-  <!-- MAIN -->
+  <!-- MAIN CHAT -->
   <div class="main">
 
-    <div class="chat" id="chat"></div>
+    <div class="topbar">
+      ProPocket AI - Prototype v1
+    </div>
+
+    <div id="chat" class="chat"></div>
 
     <div class="inputbar">
+
       <input id="msg" placeholder="Ask anything..." />
+
       <button onclick="send()">➤</button>
+
+    </div>
+
+    <div class="footer">
+      <i>by Adam Benabderrahmane — version 1 PROTOTYPE</i>
     </div>
 
   </div>
@@ -38,8 +57,6 @@
 </div>
 
 <script src="/static/script.js"></script>
-<div class="signature">
-  by Adam Benabderrahmane
-</div>
+
 </body>
 </html>
