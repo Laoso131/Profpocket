@@ -1,7 +1,3 @@
-import stripe
-
-stripe.api_key = "SK_TEST_YOUR_KEY"
-
 from flask import Flask, request, jsonify, session, render_template, redirect
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,30 +9,9 @@ app.secret_key = "CHANGE_ME_SUPER_SECRET_KEY"
 # DATABASE INIT
 # ======================
 def init_db():
-    def create_admin():
     conn = sqlite3.connect("profpocket.db")
     c = conn.cursor()
 
-    from werkzeug.security import generate_password_hash
-
-    # check si admin existe déjà
-    c.execute("SELECT * FROM users WHERE username=?", ("admin",))
-    if not c.fetchone():
-
-        c.execute(
-            "INSERT INTO users(username,password,role) VALUES(?,?,?)",
-            ("admin", generate_password_hash("admin123"), "admin")
-        )
-
-        conn.commit()
-
-    conn.close()
-
-create_admin()
-    conn = sqlite3.connect("profpocket.db")
-    c = conn.cursor()
-
-    # users table
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +21,6 @@ create_admin()
     )
     """)
 
-    # messages table
     c.execute("""
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,6 +35,27 @@ create_admin()
 init_db()
 
 # ======================
+# CREATE ADMIN AUTO
+# ======================
+def create_admin():
+    conn = sqlite3.connect("profpocket.db")
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM users WHERE username=?", ("admin",))
+    if not c.fetchone():
+
+        c.execute(
+            "INSERT INTO users(username,password,role) VALUES(?,?,?)",
+            ("admin", generate_password_hash("admin123"), "admin")
+        )
+
+        conn.commit()
+
+    conn.close()
+
+create_admin()
+
+# ======================
 # HELPERS
 # ======================
 def is_admin():
@@ -73,6 +68,7 @@ def is_admin():
 def home():
     if "user" not in session:
         return redirect("/login")
+
     return render_template("index.html", user=session["user"])
 
 # ======================
@@ -83,7 +79,7 @@ def login_page():
     return render_template("login.html")
 
 # ======================
-# REGISTER API
+# REGISTER
 # ======================
 @app.route("/register", methods=["POST"])
 def register():
@@ -92,7 +88,7 @@ def register():
     username = data.get("username")
     password = data.get("password")
 
-    hashed_pw = generate_password_hash(password)
+    hashed = generate_password_hash(password)
 
     conn = sqlite3.connect("profpocket.db")
     c = conn.cursor()
@@ -100,7 +96,7 @@ def register():
     try:
         c.execute(
             "INSERT INTO users(username,password,role) VALUES(?,?,?)",
-            (username, hashed_pw, "user")
+            (username, hashed, "user")
         )
         conn.commit()
     except:
@@ -138,7 +134,7 @@ def login():
     return jsonify({"msg": "error"})
 
 # ======================
-# CHAT API (IA TEMPORAIRE)
+# CHAT API (IA SIMPLE SAFE)
 # ======================
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -147,35 +143,27 @@ def chat():
         return jsonify({"reply": "Not logged in"})
 
     data = request.get_json()
-    msg = data.get("message")
+    msg = data.get("message", "").lower()
 
-    # 🔥 IA UPGRADE (version placeholder intelligente)
-    import requests
+    if "hello" in msg:
+        reply = "👋 Bonjour ! Je suis ProfPocket AI"
+    elif "math" in msg:
+        reply = "📘 Maths: x² dérivée = 2x"
+    elif "ai" in msg:
+        reply = "🧠 IA prête à être connectée à OpenAI / OpenRouter"
+    else:
+        reply = "🤖 Je suis en mode prototype. Connecte une API IA pour upgrade."
 
-    try:
-        response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": "Bearer YOUR_API_KEY_HERE",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "openai/gpt-4o-mini",
-                "messages": [
-                    {"role": "system", "content": "Tu es ProfPocket AI, assistant intelligent, clair et précis."},
-                    {"role": "user", "content": msg}
-                ]
-            }
-        )
-
-        reply = response.json()["choices"][0]["message"]["content"]
-
-    except:
-        reply = "⚠ IA non connectée (clé API manquante)"
+    conn = sqlite3.connect("profpocket.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO messages(user,message) VALUES(?,?)", (session["user"], msg))
+    conn.commit()
+    conn.close()
 
     return jsonify({"reply": reply})
+
 # ======================
-# ADMIN PANEL
+# ADMIN
 # ======================
 @app.route("/admin")
 def admin():
@@ -220,54 +208,3 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
-@app.route("/create-checkout-session/<plan>")
-def checkout(plan):
-
-    if plan == "pro":
-        price_id = "price_pro_id"
-    elif plan == "ultra":
-        price_id = "price_ultra_id"
-    else:
-        return "Plan invalide"
-
-    session_stripe = stripe.checkout.Session.create(
-        payment_method_types=["card"],
-        mode="subscription",
-        line_items=[{
-            "price": price_id,
-            "quantity": 1
-        }],
-        success_url="http://localhost:5000/success",
-        cancel_url="http://localhost:5000/cancel"
-    )
-
-    return redirect(session_stripe.url)
-    @app.route("/success")
-def success():
-    return "Paiement réussi ✅ Bienvenue dans Pro"
-
-@app.route("/cancel")
-def cancel():
-    return "Paiement annulé ❌"
-@app.route("/create-checkout-session/<plan>")
-def checkout(plan):
-
-    if plan == "pro":
-        price_id = "price_pro_id"
-    elif plan == "ultra":
-        price_id = "price_ultra_id"
-    else:
-        return "Plan invalide"
-
-    session_stripe = stripe.checkout.Session.create(
-        payment_method_types=["card"],
-        mode="subscription",
-        line_items=[{
-            "price": price_id,
-            "quantity": 1
-        }],
-        success_url="http://localhost:5000/success",
-        cancel_url="http://localhost:5000/cancel"
-    )
-
-    return redirect(session_stripe.url)
