@@ -1,62 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
-  <title>ProPocket AI</title>
-  <link rel="stylesheet" href="/static/style.css">
+<meta charset="UTF-8">
+<title>ProfPocket AI</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div class="app">
+<div class="container">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
+<!-- SIDEBAR -->
+<div class="sidebar">
 
-    <div class="logo">
-      🏫 ProfPocket AI
-    </div>
+<h3>ProfPocket AI</h3>
 
-    <button onclick="newChat()">+ New Chat</button>
-    <button onclick="loadHistory()">📜 History</button>
-    <button onclick="clearChat()">🗑 Clear</button>
-
-    <div class="account">
-      👤 {{ user }}
-    </div>
-
-    <a href="/logout">
-      <button class="logout">Logout</button>
-    </a>
-
-  </div>
-
-  <!-- MAIN CHAT -->
-  <div class="main">
-
-    <div class="topbar">
-      ProfPocket AI - Prototype v1
-    </div>
-
-    <div id="chat" class="chat"></div>
-
-    <div class="inputbar">
-
-      <input id="msg" placeholder="Ask anything..." />
-
-      <button onclick="send()">➤</button>
-
-    </div>
-
-    <div class="footer">
-      <i>by Adam BENABDERRAHMANE — version 1 PROTOTYPE</i>
-    </div>
-
-  </div>
+<a href="/">💬 Nouveau chat</a>
+<a href="/dashboard">📊 Dashboard</a>
+<a href="/admin">👑 Admin</a>
+<a href="/logout">🚪 Déconnexion</a>
 
 </div>
 
-<script src="/static/script.js"></script>
+<!-- CHAT -->
+<div class="chat">
+
+<!-- messages -->
+<div class="chat-box" id="chat">
+
+<div class="msg ai">
+👋 Salut ! Je suis ProfPocket AI. Pose-moi n'importe quelle question.
+</div>
+
+</div>
+
+<!-- input -->
+<div class="chat-input">
+
+<input id="msg" placeholder="Écris ta question...">
+
+<button onclick="send()">Envoyer</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let chat = document.getElementById("chat")
+
+function addMessage(text, type){
+
+  let div = document.createElement("div")
+  div.classList.add("msg")
+  div.classList.add(type)
+  div.innerText = text
+
+  chat.appendChild(div)
+  chat.scrollTop = chat.scrollHeight
+}
+
+async function send(){
+
+  let input = document.getElementById("msg")
+  let text = input.value
+
+  if(!text) return
+
+  addMessage(text, "user")
+  input.value = ""
+
+  let res = await fetch("/api/chat", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({message:text})
+  })
+
+  let data = await res.json()
+
+  addMessage(data.reply, "ai")
+}
+
+</script>
 
 </body>
 </html>
+<div style="
+position:fixed;
+bottom:10px;
+width:100%;
+text-align:center;
+font-size:12px;
+opacity:0.6;
+color:white;
+pointer-events:none;
+">
+By <i>Adam BENABDERRAHMANE</i> • ProfPocket AI v1 Prototype
+</div>
