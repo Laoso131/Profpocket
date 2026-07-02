@@ -3,10 +3,10 @@ import sqlite3
 import requests
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = "secret_key_change_me"
+app.secret_key = "change_this_key"
 
 # =========================
-# 🧠 DATABASE MEMORY
+# 🧠 DB MEMORY
 # =========================
 def init_db():
     conn = sqlite3.connect("db.db")
@@ -27,26 +27,27 @@ def init_db():
 init_db()
 
 # =========================
-# 🌐 AI (OPENROUTER = INTERNET + GPT)
+# 🤖 IA (OPENROUTER)
 # =========================
-API_KEY = "PUT_YOUR_API_KEY_HERE"
+API_KEY = "YOUR_API_KEY"
 
-def ai_response(user_message, history=[]):
+def ask_ai(message, history=[]):
 
-    system = """
+    system_prompt = """
 Tu es une IA type ChatGPT.
 Tu expliques clairement comme un professeur.
-Tu peux répondre à toutes les matières scolaires.
-Sois structuré, précis et utile.
+Tu es utile, structuré et précis.
+Tu peux aider en maths, physique, chimie, programmation.
 """
 
-    messages = [{"role": "system", "content": system}]
+    messages = [{"role": "system", "content": system_prompt}]
 
+    # mémoire légère
     for h in history[-5:]:
         messages.append({"role": "user", "content": h[0]})
         messages.append({"role": "assistant", "content": h[1]})
 
-    messages.append({"role": "user", "content": user_message})
+    messages.append({"role": "user", "content": message})
 
     response = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
@@ -70,7 +71,7 @@ def home():
     return render_template("index.html")
 
 # =========================
-# 💬 CHAT + MEMORY
+# 💬 CHAT FINAL
 # =========================
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -84,7 +85,7 @@ def chat():
     c.execute("SELECT message, response FROM messages WHERE user=? ORDER BY id DESC LIMIT 5", (user,))
     history = c.fetchall()
 
-    reply = ai_response(msg, history)
+    reply = ask_ai(msg, history)
 
     c.execute(
         "INSERT INTO messages (user, message, response) VALUES (?,?,?)",
@@ -97,7 +98,25 @@ def chat():
     return jsonify({"reply": reply})
 
 # =========================
-# 🔐 SIMPLE LOGIN (OPTION)
+# 📜 HISTORY
+# =========================
+@app.route("/history")
+def history():
+
+    user = session.get("user", "guest")
+
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+
+    c.execute("SELECT message, response FROM messages WHERE user=? ORDER BY id DESC", (user,))
+    data = c.fetchall()
+
+    conn.close()
+
+    return jsonify(data)
+
+# =========================
+# 🔐 SIMPLE LOGIN
 # =========================
 @app.route("/login", methods=["POST"])
 def login():
