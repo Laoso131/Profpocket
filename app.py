@@ -84,3 +84,42 @@ def create_checkout():
     )
 
     return {"url": session.url}
+@app.route("/success")
+def success():
+    return "Paiement réussi - Premium activé"
+
+@app.route("/cancel")
+def cancel():
+    return "Paiement annulé"
+    import stripe
+from flask import request
+
+stripe.api_key = "YOUR_SECRET_KEY"
+endpoint_secret = "YOUR_WEBHOOK_SECRET"
+@app.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.data
+    sig_header = request.headers.get("Stripe-Signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except Exception as e:
+        return str(e), 400
+
+    # 💳 PAIEMENT RÉUSSI
+    if event["type"] == "checkout.session.completed":
+        session = event["data"]["object"]
+
+        # email utilisateur Stripe
+        customer_email = session.get("customer_details", {}).get("email")
+
+        if customer_email:
+            user = User.query.filter_by(username=customer_email).first()
+
+            if user:
+                user.is_premium = True
+                db.session.commit()
+
+    return "success", 200
