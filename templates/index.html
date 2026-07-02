@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>ProfPocket AI</title>
+  <title>AI SaaS</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -13,39 +12,25 @@
 
   <!-- SIDEBAR -->
   <div class="sidebar">
+    <div class="logo">⚡ AI SaaS</div>
 
-    <div class="logo">
-      ⚡ ProfPocket AI
-    </div>
-
-    <button onclick="newChat()">+ Nouveau chat</button>
-    <button onclick="loadHistory()">📜 Historique</button>
+    <button onclick="newChat()">+ New chat</button>
+    <button onclick="loadHistory()">📜 History</button>
 
     <div class="premium">
-      💎 Pass Premium
-      <p>IA illimitée + rapide</p>
+      💎 Premium AI
+      <p>Fast + Smart + Unlimited</p>
     </div>
-
   </div>
 
   <!-- MAIN -->
   <div class="main">
 
-    <!-- TOP BAR -->
-    <div class="topbar">
-      <h2>Assistant intelligent</h2>
-    </div>
+    <div class="chat" id="chat"></div>
 
-    <!-- CHAT -->
-    <div id="chat" class="chat"></div>
-
-    <!-- INPUT -->
     <div class="inputbar">
-
-      <input id="msg" placeholder="Pose ta question..." />
-
+      <input id="msg" placeholder="Ask anything..." />
       <button onclick="send()">➤</button>
-
     </div>
 
   </div>
@@ -56,4 +41,3 @@
 
 </body>
 </html>
-
