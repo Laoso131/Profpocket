@@ -1,3 +1,7 @@
+import stripe
+
+stripe.api_key = "SK_TEST_YOUR_KEY"
+
 from flask import Flask, request, jsonify, session, render_template, redirect
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
