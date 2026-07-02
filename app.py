@@ -64,3 +64,23 @@ def health():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
+@app.route("/create-checkout-session")
+def create_checkout():
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        line_items=[{
+            "price_data": {
+                "currency": "eur",
+                "product_data": {
+                    "name": "ProfPocket Premium"
+                },
+                "unit_amount": 500,  # 5€
+            },
+            "quantity": 1,
+        }],
+        mode="payment",
+        success_url="https://your-site.up.railway.app/success",
+        cancel_url="https://your-site.up.railway.app/cancel",
+    )
+
+    return {"url": session.url}
