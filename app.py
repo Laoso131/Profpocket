@@ -1,59 +1,53 @@
 from flask import Flask, request, jsonify, session, render_template, redirect
 
 app = Flask(__name__)
-app.secret_key = "secret_key_change_me"
+app.secret_key = "change_me"
 
 # ======================
-# HOME
+# HOME (protégé)
 # ======================
 @app.route("/")
 def home():
     if "user" not in session:
         return redirect("/login")
-    return render_template("index.html")
+    return "<h1>HOME OK</h1>"
 
 # ======================
-# LOGIN PAGE (GET ONLY)
+# LOGIN PAGE (GET)
 # ======================
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html")
 
 # ======================
-# LOGIN API (POST ONLY)
+# LOGIN API (POST)
 # ======================
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
 
-    username = data.get("username")
-    password = data.get("password")
+    u = data.get("username")
+    p = data.get("password")
 
-    # LOGIN TEST SIMPLE (évite DB bug)
-    if username == "admin" and password == "1234":
-        session["user"] = username
+    # TEST SIMPLE (sans DB pour éviter bugs)
+    if u == "admin" and p == "1234":
+        session["user"] = u
         return jsonify({"msg": "ok"})
 
     return jsonify({"msg": "error"})
 
 # ======================
-# REGISTER PAGE (OPTIONNEL)
+# REGISTER API
 # ======================
-@app.route("/register", methods=["GET"])
-def register_page():
-    return "<h1>Register page (optional)</h1>"
-
-# ======================
-# CHAT TEST
-# ======================
-@app.route("/chat", methods=["POST"])
-def chat():
+@app.route("/register", methods=["POST"])
+def register():
     data = request.get_json()
-    msg = data.get("message", "")
 
-    return jsonify({
-        "reply": "🤖 AI: " + msg
-    })
+    u = data.get("username")
+    p = data.get("password")
+
+    # DEMO SIMPLE
+    return jsonify({"msg": "created"})
 
 # ======================
 # LOGOUT
