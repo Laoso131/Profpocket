@@ -84,3 +84,17 @@ document.addEventListener("keydown", function(e) {
         send();
     }
 });
+async function search() {
+    const input = document.querySelector(".search-input").value;
+
+    const res = await fetch("/search", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query: input })
+    });
+
+    const data = await res.json();
+    console.log(data);
+}
