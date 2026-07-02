@@ -123,11 +123,14 @@ async function login(){
   let u = document.getElementById("username").value
   let p = document.getElementById("password").value
 
-  let res = await fetch("/login", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({username:u,password:p})
+  let res = await fetch("/api/login", {
+  method: "POST",
+  headers: {"Content-Type": "application/json"},
+  body: JSON.stringify({
+    username: u,
+    password: p
   })
+})
 
   let data = await res.json()
 
