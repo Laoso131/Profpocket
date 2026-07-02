@@ -143,27 +143,33 @@ def chat():
         return jsonify({"reply": "Not logged in"})
 
     data = request.get_json()
-    msg = data.get("message", "").lower()
+    msg = data.get("message")
 
-    # IA simple (placeholder)
-    if "math" in msg:
-        reply = "📘 Exemple: f(x)=x² → dérivée = 2x"
-    elif "physics" in msg:
-        reply = "⚡ F = m × a"
-    elif "hello" in msg:
-        reply = "👋 Bonjour ! Je suis ProfPocket AI"
-    else:
-        reply = "🤖 IA en mode prototype — API non connectée encore"
+    # 🔥 IA UPGRADE (version placeholder intelligente)
+    import requests
 
-    # save message
-    conn = sqlite3.connect("profpocket.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO messages(user,message) VALUES(?,?)", (session["user"], msg))
-    conn.commit()
-    conn.close()
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": "Bearer YOUR_API_KEY_HERE",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "openai/gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "Tu es ProfPocket AI, assistant intelligent, clair et précis."},
+                    {"role": "user", "content": msg}
+                ]
+            }
+        )
+
+        reply = response.json()["choices"][0]["message"]["content"]
+
+    except:
+        reply = "⚠ IA non connectée (clé API manquante)"
 
     return jsonify({"reply": reply})
-
 # ======================
 # ADMIN PANEL
 # ======================
