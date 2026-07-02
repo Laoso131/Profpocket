@@ -1,44 +1,86 @@
+let chatBox = document.getElementById("chat");
+
+// ======================
+// ADD MESSAGE
+// ======================
+function addMessage(text, type) {
+    let div = document.createElement("div");
+    div.classList.add("msg");
+    div.classList.add(type);
+
+    div.innerText = text;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ======================
+// TYPING EFFECT (AI)
+// ======================
+function typingEffect(text, callback) {
+
+    let i = 0;
+    let temp = "";
+
+    let interval = setInterval(() => {
+
+        if (i < text.length) {
+            temp += text[i];
+            chatBox.lastChild.innerText = temp;
+            i++;
+        } else {
+            clearInterval(interval);
+            if (callback) callback();
+        }
+
+    }, 20);
+}
+
+// ======================
+// SEND MESSAGE
+// ======================
 async function send() {
 
-  let msg = document.getElementById("msg").value;
-  if (!msg) return;
+    let input = document.getElementById("msg");
+    let text = input.value;
 
-  document.getElementById("chat").innerHTML += `<div class="msg"><b>You:</b> ${msg}</div>`;
+    if (!text) return;
 
-  const eventSource = new EventSourcePolyfill("/stream", {
-    method: "POST",
-    body: JSON.stringify({message: msg}),
-    headers: {"Content-Type": "application/json"}
-  });
+    // user message
+    addMessage(text, "user");
 
-  let aiBox = document.createElement("div");
-  aiBox.className = "msg";
-  aiBox.innerHTML = "<b>AI:</b> ";
-  document.getElementById("chat").appendChild(aiBox);
+    input.value = "";
 
-  eventSource.onmessage = function(event) {
-    aiBox.innerHTML += event.data.replaceAll('"','');
-  };
+    // placeholder AI message
+    addMessage("...", "ai");
+
+    try {
+
+        let res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
+
+        let data = await res.json();
+
+        // replace last message (AI)
+        chatBox.lastChild.innerText = "";
+
+        let reply = data.reply || "Erreur IA";
+
+        typingEffect(reply);
+
+    } catch (err) {
+        chatBox.lastChild.innerText = "Erreur serveur";
+    }
 }
 
-function addMsg(type, text) {
-  document.getElementById("chat").innerHTML += `
-    <div class="msg ${type}">${text}</div>
-  `
-}
-
-async function loadHistory() {
-  let res = await fetch("/history")
-  let data = await res.json()
-
-  document.getElementById("chat").innerHTML = ""
-
-  data.forEach(m => {
-    addMsg("user", m[0])
-    addMsg("bot", m[1])
-  })
-}
-
-function newChat() {
-  document.getElementById("chat").innerHTML = ""
-}
+// ======================
+// ENTER TO SEND
+// ======================
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        send();
+    }
+});
