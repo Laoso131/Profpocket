@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Login</title>
+  <title>Login SaaS</title>
 
   <style>
     body {
@@ -17,13 +17,20 @@
     }
 
     .box {
-      width: 320px;
+      width: 340px;
       padding: 25px;
-      background: rgba(20,20,20,0.9);
       border-radius: 16px;
+      background: rgba(20,20,20,0.85);
       border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
       text-align: center;
-      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      background: linear-gradient(90deg,#00ffcc,#3b82f6);
+      -webkit-background-clip: text;
+      color: transparent;
     }
 
     input {
@@ -47,15 +54,20 @@
       background: linear-gradient(135deg,#00ffcc,#3b82f6);
       font-weight: bold;
       color: black;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.03);
     }
 
     #msg {
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 10px;
       border-radius: 10px;
+      font-size: 14px;
       opacity: 0;
       transition: 0.3s;
-      font-size: 14px;
     }
 
     .success {
@@ -71,6 +83,12 @@
       color: #ff4d6d;
       opacity: 1 !important;
     }
+
+    .small {
+      font-size: 12px;
+      opacity: 0.6;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
@@ -78,48 +96,69 @@
 
 <div class="box">
 
-  <h2>Login</h2>
+  <h2>NeoAI Login</h2>
 
   <input id="username" placeholder="Username">
   <input id="password" type="password" placeholder="Password">
 
   <button onclick="login()">Login</button>
+  <button onclick="register()" style="background:#111;color:white;margin-top:5px;">Register</button>
 
   <div id="msg"></div>
+
+  <div class="small">By continuing you accept the terms</div>
 
 </div>
 
 <script>
-async function login() {
+
+function show(msg, type){
+  let m = document.getElementById("msg")
+  m.innerText = msg
+  m.className = type
+}
+
+async function login(){
 
   let u = document.getElementById("username").value
   let p = document.getElementById("password").value
-  let msg = document.getElementById("msg")
-
-  msg.className = ""
-  msg.innerText = "Loading..."
 
   let res = await fetch("/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({username: u, password: p})
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({username:u,password:p})
   })
 
   let data = await res.json()
 
-  if (data.msg === "ok") {
-    msg.innerText = "✔ Login successful"
-    msg.className = "success"
-
-    setTimeout(() => {
-      window.location.href = "/"
-    }, 800)
-
+  if(data.msg === "ok"){
+    show("✔ Welcome back", "success")
+    setTimeout(()=> window.location.href="/", 800)
   } else {
-    msg.innerText = "✖ Wrong username or password"
-    msg.className = "error"
+    show("✖ Invalid credentials", "error")
   }
 }
+
+async function register(){
+
+  let u = document.getElementById("username").value
+  let p = document.getElementById("password").value
+
+  let res = await fetch("/register", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({username:u,password:p})
+  })
+
+  let data = await res.json()
+
+  if(data.msg === "created"){
+    show("✔ Account created", "success")
+  } else {
+    show("⚠ User already exists", "error")
+  }
+}
+
 </script>
 
 </body>
