@@ -1,49 +1,340 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>ProfPocket AI - Admin</title>
+<meta charset="UTF-8">
+<title>ProfPocket AI • Administration</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+
+background:linear-gradient(135deg,#050816,#111827,#0f172a);
+color:white;
+
+}
+
+header{
+
+height:80px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 40px;
+
+background:#0b1224;
+
+border-bottom:2px solid #2563eb;
+
+}
+
+.logo{
+
+font-size:30px;
+
+font-weight:bold;
+
+color:#3b82f6;
+
+}
+
+.admin{
+
+color:#94a3b8;
+
+}
+
+.container{
+
+display:grid;
+
+grid-template-columns:250px 1fr;
+
+min-height:calc(100vh - 80px);
+
+}
+
+.sidebar{
+
+background:#111827;
+
+padding:25px;
+
+}
+
+.sidebar h3{
+
+margin-bottom:20px;
+
+color:#60a5fa;
+
+}
+
+.sidebar a{
+
+display:block;
+
+padding:12px;
+
+margin-bottom:10px;
+
+background:#1e293b;
+
+border-radius:10px;
+
+text-decoration:none;
+
+color:white;
+
+transition:.2s;
+
+}
+
+.sidebar a:hover{
+
+background:#2563eb;
+
+}
+
+.content{
+
+padding:35px;
+
+}
+
+.cards{
+
+display:grid;
+
+grid-template-columns:repeat(4,1fr);
+
+gap:20px;
+
+margin-bottom:30px;
+
+}
+
+.card{
+
+background:#1e293b;
+
+padding:25px;
+
+border-radius:18px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+
+}
+
+.card h2{
+
+font-size:35px;
+
+margin-bottom:10px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:#111827;
+
+border-radius:15px;
+
+overflow:hidden;
+
+}
+
+th{
+
+background:#2563eb;
+
+padding:15px;
+
+}
+
+td{
+
+padding:14px;
+
+border-bottom:1px solid #26344d;
+
+text-align:center;
+
+}
+
+.btn{
+
+padding:8px 15px;
+
+border:none;
+
+border-radius:8px;
+
+cursor:pointer;
+
+background:#2563eb;
+
+color:white;
+
+}
+
+.btn-danger{
+
+background:#dc2626;
+
+}
+
+.footer{
+
+margin-top:40px;
+
+text-align:center;
+
+opacity:.6;
+
+font-style:italic;
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-<h1>Panel Administrateur</h1>
+<header>
 
-<p>Bienvenue {{ session["user"] }}</p>
+<div class="logo">
 
-<p>Ici tu pourras gérer les utilisateurs, les abonnements, les statistiques et les conversations.</p>
+ProfPocket AI • ADMIN
 
-<a href="/">Retour au chat</a>
+</div>
 
-</body>
-<html>
-<head>
-    <title>Admin - ProfPocket AI</title>
-</head>
-<body>
+<div class="admin">
 
-<h1>Administration ProfPocket AI</h1>
+Connecté : <b>{{ session["user"] }}</b>
 
-<p>Connecté en tant que : <b>{{ session["user"] }}</b></p>
+</div>
 
-<h2>Utilisateurs</h2>
+</header>
 
-<table border="1" cellpadding="8">
+<div class="container">
+
+<div class="sidebar">
+
+<h3>Navigation</h3>
+
+<a href="/">💬 Chat IA</a>
+
+<a href="/dashboard">📊 Dashboard</a>
+
+<a href="/admin">👑 Administration</a>
+
+<a href="#">👥 Utilisateurs</a>
+
+<a href="#">💳 Abonnements</a>
+
+<a href="#">📈 Statistiques</a>
+
+<a href="#">🤖 Configuration IA</a>
+
+<a href="#">🖼 Génération d'images</a>
+
+<a href="#">📄 PDF</a>
+
+<a href="#">🎤 Voice Chat</a>
+
+<a href="/logout">🚪 Déconnexion</a>
+
+</div>
+
+<div class="content">
+
+<div class="cards">
+
+<div class="card">
+<h2>{{ users|length }}</h2>
+Utilisateurs
+</div>
+
+<div class="card">
+<h2>0</h2>
+Abonnements Premium
+</div>
+
+<div class="card">
+<h2>0</h2>
+Messages aujourd'hui
+</div>
+
+<div class="card">
+<h2>En ligne</h2>
+Serveur
+</div>
+
+</div>
+
+<h2 style="margin-bottom:20px;">Liste des utilisateurs</h2>
+
+<table>
+
 <tr>
-    <th>ID</th>
-    <th>Nom d'utilisateur</th>
+
+<th>ID</th>
+
+<th>Utilisateur</th>
+
+<th>Actions</th>
+
 </tr>
 
 {% for user in users %}
+
 <tr>
-    <td>{{ user[0] }}</td>
-    <td>{{ user[1] }}</td>
+
+<td>{{ user[0] }}</td>
+
+<td>{{ user[1] }}</td>
+
+<td>
+
+<button class="btn">Voir</button>
+
+<button class="btn">Modifier</button>
+
+<button class="btn btn-danger">Supprimer</button>
+
+</td>
+
 </tr>
+
 {% endfor %}
 
 </table>
 
-<br>
+<div class="footer">
 
-<a href="/">Retour</a>
+Version 1.0 • Créé par <b><i>Adam Benabderrahmane</i></b>
+
+</div>
+
+</div>
+
+</div>
 
 </body>
 </html>
