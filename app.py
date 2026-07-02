@@ -87,3 +87,27 @@ def login():
 
 if __name__ == "__main__":
     app.run(debug=True)
+from flask import Flask, request, jsonify, render_template
+
+app = Flask(__name__, static_folder="static", template_folder="templates")
+
+def ai(msg):
+    msg = msg.lower()
+
+    if "math" in msg:
+        return "📘 Je peux t'aider en maths (équations, dérivées, fonctions)."
+    return "🤖 Pose une question plus précise."
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    data = request.get_json()
+    msg = data.get("message")
+
+    return jsonify({"reply": ai(msg)})
+
+if __name__ == "__main__":
+    app.run(debug=True)
