@@ -1,25 +1,38 @@
-async function send() {
-
-    let input = document.getElementById("msg")
-    let msg = input.value
-
-    if (!msg) return
-
-    document.getElementById("chat-box").innerHTML += `
-        <div class="msg">👤 ${msg}</div>
-    `
+async function send(){
+    let msg = document.getElementById("msg").value
 
     let res = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: msg })
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({message:msg})
     })
 
     let data = await res.json()
 
-    document.getElementById("chat-box").innerHTML += `
-        <div class="msg">🤖 ${data.reply}</div>
+    document.getElementById("chat").innerHTML += `
+        <div>👤 ${msg}</div>
+        <div>🤖 ${data.reply}</div>
     `
+}
 
-    input.value = ""
+async function register(){
+    await fetch("/register",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            username:document.getElementById("u").value,
+            password:document.getElementById("p").value
+        })
+    })
+}
+
+async function login(){
+    await fetch("/login",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            username:document.getElementById("u").value,
+            password:document.getElementById("p").value
+        })
+    })
 }
