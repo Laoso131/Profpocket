@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - ProfPocket AI</title>
+</head>
+<body>
+
+<h1>Administration ProfPocket AI</h1>
+
+<p>Connecté en tant que : <b>{{ session["user"] }}</b></p>
+
+<h2>Utilisateurs</h2>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>ID</th>
+    <th>Nom d'utilisateur</th>
+</tr>
+
+{% for user in users %}
+<tr>
+    <td>{{ user[0] }}</td>
+    <td>{{ user[1] }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/">Retour</a>
+
+</body>
+</html>
