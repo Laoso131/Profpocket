@@ -1,13 +1,13 @@
-from flask import Flask, request, jsonify, render_template, session, redirect
+from flask import Flask, render_template, request, jsonify, session, redirect
 import sqlite3
 import requests
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
-app.secret_key = "CHANGE_THIS_SECRET"
+app.secret_key = "CHANGE_THIS_KEY"
 
 # =========================
-# 🔐 GOOGLE LOGIN
+# 🔐 GOOGLE AUTH
 # =========================
 oauth = OAuth(app)
 
@@ -22,7 +22,7 @@ google = oauth.register(
 )
 
 # =========================
-# 💾 DATABASE
+# 💾 DB
 # =========================
 def init_db():
     conn = sqlite3.connect("db.db")
@@ -43,35 +43,30 @@ def init_db():
 init_db()
 
 # =========================
-# 🧠 IA
+# 🧠 IA (OpenRouter)
 # =========================
-API_KEY = "YOUR_API_KEY"
+API_KEY = "YOUR_OPENROUTER_KEY"
 
-def ask_ai(message, history=[]):
+def ask_ai(message, history):
 
-    messages = [
-        {"role": "system", "content": "Tu es une IA type ChatGPT très intelligente et claire."}
-    ]
+    msgs = [{"role": "system", "content": "Tu es une IA utile, claire et éducative."}]
 
-    for h in history[-5:]:
-        messages.append({"role": "user", "content": h[0]})
-        messages.append({"role": "assistant", "content": h[1]})
+    for h in history[-6:]:
+        msgs.append({"role": "user", "content": h[0]})
+        msgs.append({"role": "assistant", "content": h[1]})
 
-    messages.append({"role": "user", "content": message})
+    msgs.append({"role": "user", "content": message})
 
-    res = requests.post(
+    r = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
         headers={
             "Authorization": f"Bearer {API_KEY}",
             "Content-Type": "application/json"
         },
-        json={
-            "model": "gpt-4o-mini",
-            "messages": messages
-        }
+        json={"model": "gpt-4o-mini", "messages": msgs}
     )
 
-    return res.json()["choices"][0]["message"]["content"]
+    return r.json()["choices"][0]["message"]["content"]
 
 # =========================
 # 🏠 HOME
@@ -86,16 +81,13 @@ def home():
 # 🔐 LOGIN PAGE
 # =========================
 @app.route("/login")
-def login_page():
+def login():
     return render_template("login.html")
 
-# =========================
-# 🔐 LOGIN EMAIL SIMPLE
-# =========================
 @app.route("/login/email", methods=["POST"])
 def login_email():
-    session["user"] = request.json.get("email")
-    return jsonify({"status": "ok"})
+    session["user"] = request.json["email"]
+    return jsonify({"ok": True})
 
 # =========================
 # 🔑 GOOGLE LOGIN
@@ -107,7 +99,7 @@ def login_google():
 @app.route("/auth/callback")
 def callback():
     token = google.authorize_access_token()
-    user = google.get('userinfo').json()
+    user = google.get("userinfo").json()
     session["user"] = user["email"]
     return redirect("/")
 
@@ -116,20 +108,18 @@ def callback():
 # =========================
 @app.route("/chat", methods=["POST"])
 def chat():
-
-    msg = request.json.get("message")
     user = session.get("user")
+    msg = request.json["message"]
 
     conn = sqlite3.connect("db.db")
     c = conn.cursor()
 
-    c.execute("SELECT message, response FROM messages WHERE user=? ORDER BY id DESC LIMIT 5", (user,))
+    c.execute("SELECT message, response FROM messages WHERE user=? ORDER BY id DESC LIMIT 6", (user,))
     history = c.fetchall()
 
     reply = ask_ai(msg, history)
 
-    c.execute("INSERT INTO messages (user, message, response) VALUES (?,?,?)",
-              (user, msg, reply))
+    c.execute("INSERT INTO messages VALUES (NULL,?,?,?)", (user, msg, reply))
 
     conn.commit()
     conn.close()
@@ -141,7 +131,6 @@ def chat():
 # =========================
 @app.route("/history")
 def history():
-
     user = session.get("user")
 
     conn = sqlite3.connect("db.db")
@@ -150,12 +139,11 @@ def history():
     c.execute("SELECT message, response FROM messages WHERE user=? ORDER BY id DESC", (user,))
     data = c.fetchall()
 
-    conn.close()
-
     return jsonify(data)
 
 # =========================
 # RUN
 # =========================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
+    
