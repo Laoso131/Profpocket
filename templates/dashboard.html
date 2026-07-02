@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+  <title>Dashboard - ProPocket AI</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <h1>📊 Dashboard</h1>
+
+  <div class="card">
+    👤 User: {{ user }}
+  </div>
+
+  <div class="card">
+    💎 Plan: {{ plan }}
+  </div>
+
+  <div class="card">
+    ⚡ Upgrade Pro AI
+    <a href="/subscribe">
+      <button>Go Premium</button>
+    </a>
+  </div>
+
+  <div class="card">
+    🤖 Features:
+    <ul>
+      <li>Streaming AI</li>
+      <li>Chat History</li>
+      <li>PDF (future)</li>
+      <li>Image AI (future)</li>
+    </ul>
+  </div>
+
+  <a href="/">
+    <button>Go to Chat</button>
+  </a>
+
+</div>
+
+</body>
+</html>
