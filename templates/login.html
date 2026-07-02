@@ -1,47 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Login - ProfPocket</title>
-  <link rel="stylesheet" href="/static/style.css">
-</head>
+from flask import Flask, request, jsonify, session, render_template
+import sqlite3
 
-<body>
+app = Flask(__name__)
+app.secret_key = "super_secret_key"
 
-<div class="login-box">
+# ======================
+# DB INIT
+# ======================
+def init_db():
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
 
-  <h2>Login</h2>
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )
+    """)
 
-  <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
+    conn.commit()
+    conn.close()
 
-  <button onclick="login()">Login</button>
+init_db()
 
-  <p id="msg"></p>
+# ======================
+# REGISTER (test)
+# ======================
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    u = data.get("username")
+    p = data.get("password")
 
-</div>
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO users (username, password) VALUES (?,?)", (u, p))
+    conn.commit()
+    conn.close()
 
-<script>
-async function login() {
+    return jsonify({"msg": "created"})
 
-  let u = document.getElementById("username").value
-  let p = document.getElementById("password").value
+# ======================
+# LOGIN
+# ======================
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    u = data.get("username")
+    p = data.get("password")
 
-  let res = await fetch("/login", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({username: u, password: p})
-  })
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
 
-  let data = await res.json()
+    c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, p))
+    user = c.fetchone()
 
-  if (data.msg === "ok") {
-    document.getElementById("msg").innerText = "✅ Login success"
-    window.location.href = "/"
-  } else {
-    document.getElementById("msg").innerText = "❌ Error login"
-  }
-}
-</script>
+    conn.close()
 
-</body>
-</html>
+    if user:
+        session["user"] = u
+        return jsonify({"msg": "ok"})
+
+    return jsonify({"msg": "error"})
+
+# ======================
+# LOGIN PAGE
+# ======================
+@app.route("/login")
+def login_page():
+    return render_template("login.html")
+
+# ======================
+# HOME TEST
+# ======================
+@app.route("/")
+def home():
+    if "user" not in session:
+        return render_template("login.html")
+    return "Logged in ✔"
+
+if __name__ == "__main__":
+    app.run(debug=True)
