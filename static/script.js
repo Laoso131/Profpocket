@@ -4,10 +4,7 @@ async function send() {
   let msg = input.value
   if (!msg) return
 
-  document.getElementById("chat").innerHTML += `
-    <div class="msg user">👤 ${msg}</div>
-  `
-
+  addMsg("user", msg)
   input.value = ""
 
   let res = await fetch("/chat", {
@@ -18,11 +15,29 @@ async function send() {
 
   let data = await res.json()
 
+  addMsg("bot", data.reply)
+}
+
+function addMsg(type, text) {
   document.getElementById("chat").innerHTML += `
-    <div class="msg bot">🤖 ${data.reply}</div>
+    <div class="msg ${type}">
+      ${text}
+    </div>
   `
 }
 
-function newChat(){
+function newChat() {
   document.getElementById("chat").innerHTML = ""
+}
+
+async function loadHistory() {
+  let res = await fetch("/history")
+  let data = await res.json()
+
+  document.getElementById("chat").innerHTML = ""
+
+  data.reverse().forEach(m => {
+    addMsg("user", m[1])
+    addMsg("bot", m[2])
+  })
 }
