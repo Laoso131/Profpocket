@@ -3,3 +3,4 @@ openai
 requests
 stripe
 gunicorn
+werkzeug
