@@ -112,3 +112,21 @@ if __name__ == "__main__":
     app.run(debug=True)
 def is_admin():
     return session.get("user") == "admin"
+@app.route("/admin")
+def admin():
+
+    if "user" not in session:
+        return redirect("/login")
+
+    if not is_admin():
+        return "Accès refusé", 403
+
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+
+    c.execute("SELECT id, username FROM users")
+    users = c.fetchall()
+
+    conn.close()
+
+    return render_template("admin.html", users=users)
