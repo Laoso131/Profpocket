@@ -110,3 +110,5 @@ def logout():
 # ======================
 if __name__ == "__main__":
     app.run(debug=True)
+def is_admin():
+    return session.get("user") == "admin"
