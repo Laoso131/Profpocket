@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, render_template, session
 import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = "profpocket_secret"
+app.secret_key = "profpocket_secret_key"
 
-# 🧠 IA UNIQUE
+# 🧠 IA SIMPLE MAIS PROPRE
 def ai(msg):
     msg = msg.lower()
 
@@ -17,7 +18,7 @@ def ai(msg):
 
     return "🤖 Pose une question plus précise."
 
-# 🗄️ DB INIT
+# 🗄️ INIT DB
 def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
@@ -25,8 +26,16 @@ def init_db():
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
+            username TEXT UNIQUE,
             password TEXT
+        )
+    """)
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            message TEXT
         )
     """)
 
@@ -35,29 +44,47 @@ def init_db():
 
 init_db()
 
+# 🏠 HOME
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# 🤖 CHAT + SAUVEGARDE
 @app.route("/chat", methods=["POST"])
 def chat():
     msg = request.json.get("message")
-    return jsonify({"reply": ai(msg)})
+    user = session.get("user", "guest")
 
+    reply = ai(msg)
+
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+    c.execute("INSERT INTO messages (username, message) VALUES (?,?)", (user, msg))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"reply": reply})
+
+# 👤 REGISTER SECURISÉ
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
     u = data["username"]
-    p = data["password"]
+    p = generate_password_hash(data["password"])
 
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
-    c.execute("INSERT INTO users (username, password) VALUES (?,?)", (u,p))
-    conn.commit()
-    conn.close()
 
+    try:
+        c.execute("INSERT INTO users (username, password) VALUES (?,?)", (u,p))
+        conn.commit()
+    except:
+        return jsonify({"msg": "user exists"})
+
+    conn.close()
     return jsonify({"msg": "user created"})
 
+# 🔐 LOGIN SECURISÉ
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -66,14 +93,26 @@ def login():
 
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=? AND password=?", (u,p))
+    c.execute("SELECT password FROM users WHERE username=?", (u,))
     user = c.fetchone()
     conn.close()
 
-    if user:
+    if user and check_password_hash(user[0], p):
         session["user"] = u
         return jsonify({"msg": "ok"})
+
     return jsonify({"msg": "error"})
+
+# 📜 HISTORIQUE CHAT
+@app.route("/history")
+def history():
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+    c.execute("SELECT username, message FROM messages ORDER BY id DESC LIMIT 20")
+    data = c.fetchall()
+    conn.close()
+
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(debug=True)
