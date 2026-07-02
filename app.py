@@ -100,6 +100,10 @@ def login_page():
 @app.route("/register-page")
 def register_page():
     return render_template("register.html")
-
+@app.route("/")
+def home():
+    if "user" not in session:
+        return redirect("/login")
+    return render_template("index.html", user=session["user"])
 if __name__ == "__main__":
     app.run(debug=True)
