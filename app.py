@@ -5,16 +5,6 @@ app = Flask(__name__)
 app.secret_key = "change_me"
 def is_admin():
     return session.get("user") == "admin"
-    @app.route("/admin")
-def admin():
-
-    if "user" not in session:
-        return redirect("/login")
-
-    if not is_admin():
-        return "Accès refusé", 403
-
-    return render_template("admin.html")
 
 # ======================
 # DATABASE
@@ -120,6 +110,16 @@ def logout():
 # ======================
 # RUN
 # ======================
+@app.route("/admin")
+def admin():
+
+    if "user" not in session:
+        return redirect("/login")
+
+    if session.get("user") != "admin":
+        return "Accès refusé", 403
+
+    return render_template("admin.html")
 if __name__ == "__main__":
     app.run(debug=True)
 def is_admin():
