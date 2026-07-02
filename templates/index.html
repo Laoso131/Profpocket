@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
+
 <head>
-  <title>ProfPocket</title>
+  <meta charset="UTF-8">
+  <title>ProfPocket AI</title>
   <link rel="stylesheet" href="/static/style.css">
 </head>
 
@@ -9,18 +11,41 @@
 
 <div class="app">
 
+  <!-- SIDEBAR -->
   <div class="sidebar">
-    <h2>⚡ ProfPocket</h2>
-    <button onclick="newChat()">+ New chat</button>
+
+    <div class="logo">
+      ⚡ ProfPocket AI
+    </div>
+
+    <button onclick="newChat()">+ Nouveau chat</button>
+    <button onclick="loadHistory()">📜 Historique</button>
+
+    <div class="premium">
+      💎 Pass Premium
+      <p>IA illimitée + rapide</p>
+    </div>
+
   </div>
 
+  <!-- MAIN -->
   <div class="main">
 
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <h2>Assistant intelligent</h2>
+    </div>
+
+    <!-- CHAT -->
     <div id="chat" class="chat"></div>
 
-    <div class="input-area">
-      <input id="msg" placeholder="Message..." />
+    <!-- INPUT -->
+    <div class="inputbar">
+
+      <input id="msg" placeholder="Pose ta question..." />
+
       <button onclick="send()">➤</button>
+
     </div>
 
   </div>
