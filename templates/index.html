@@ -1,70 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ProfPocket SaaS</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0d0d0d;
+    color: white;
+}
 
-<body>
+/* layout */
+.app {
+    display: flex;
+    height: 100vh;
+}
 
-<div class="container">
+/* sidebar */
+.sidebar {
+    width: 260px;
+    background: #111;
+    padding: 15px;
+    border-right: 1px solid #222;
+}
 
-    <h1>⚡ ProfPocket SaaS</h1>
+.sidebar h2 {
+    color: #00ff88;
+}
 
-    <!-- LOGIN -->
-    <div class="auth">
-        <input id="u" placeholder="username">
-        <input id="p" placeholder="password" type="password">
-        <button onclick="register()">Register</button>
-        <button onclick="login()">Login</button>
-    </div>
+/* main */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-    <hr>
+/* chat */
+.chat {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
 
-    <!-- CHAT -->
-    <div id="chat"></div>
+/* messages */
+.msg {
+    max-width: 70%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 12px;
+    line-height: 1.4;
+}
 
-    <input id="msg" placeholder="Pose une question">
-    <button onclick="send()">Envoyer</button>
+.user {
+    background: #1f1f1f;
+    align-self: flex-end;
+    margin-left: auto;
+}
 
-</div>
+.bot {
+    background: #2a2a2a;
+    border-left: 3px solid #00ff88;
+}
 
-<script src="/static/script.js"></script>
+/* input */
+.inputbar {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #222;
+}
 
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ProfPocket</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
+input {
+    flex: 1;
+    padding: 12px;
+    background: #111;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 8px;
+}
 
-<body>
+button {
+    margin-left: 10px;
+    padding: 12px 16px;
+    background: #00ff88;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+}
 
-<div class="app">
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h2>⚡ ProfPocket</h2>
-        <button onclick="newChat()">+ Nouveau chat</button>
-    </div>
-
-    <!-- MAIN -->
-    <div class="main">
-
-        <div id="chat" class="chat"></div>
-
-        <div class="inputbar">
-            <input id="msg" placeholder="Message..." />
-            <button onclick="send()">➤</button>
-        </div>
-
-    </div>
-
-</div>
-
-<script src="/static/script.js"></script>
-
-</body>
-</html>
