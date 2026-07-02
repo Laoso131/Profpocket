@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify, render_template, session
 import sqlite3
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = "profpocket_secret"
 
-# 🧠 IA CORE
+# 🧠 IA UNIQUE
 def ai(msg):
     msg = msg.lower()
 
@@ -14,13 +14,14 @@ def ai(msg):
         return "⚡ F = m × a"
     if "chimie" in msg:
         return "🧪 H2 + O2 → H2O"
-    
-    return "🤖 ProfPocket SaaS : pose une question plus précise."
+
+    return "🤖 Pose une question plus précise."
 
 # 🗄️ DB INIT
 def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
+
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,13 +29,7 @@ def init_db():
             password TEXT
         )
     """)
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user TEXT,
-            message TEXT
-        )
-    """)
+
     conn.commit()
     conn.close()
 
@@ -44,15 +39,11 @@ init_db()
 def home():
     return render_template("index.html")
 
-# 🤖 CHAT IA
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
-    msg = data.get("message")
-
+    msg = request.json.get("message")
     return jsonify({"reply": ai(msg)})
 
-# 👤 REGISTER SIMPLE
 @app.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -67,7 +58,6 @@ def register():
 
     return jsonify({"msg": "user created"})
 
-# 🔐 LOGIN SIMPLE
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -84,30 +74,6 @@ def login():
         session["user"] = u
         return jsonify({"msg": "ok"})
     return jsonify({"msg": "error"})
-
-if __name__ == "__main__":
-    app.run(debug=True)
-from flask import Flask, request, jsonify, render_template
-
-app = Flask(__name__, static_folder="static", template_folder="templates")
-
-def ai(msg):
-    msg = msg.lower()
-
-    if "math" in msg:
-        return "📘 Je peux t'aider en maths (équations, dérivées, fonctions)."
-    return "🤖 Pose une question plus précise."
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    msg = data.get("message")
-
-    return jsonify({"reply": ai(msg)})
 
 if __name__ == "__main__":
     app.run(debug=True)
