@@ -1,85 +1,25 @@
-async function sendMessage(){
+async function send() {
 
-let msg=
-document
-.getElementById(
-"message"
-).value
+    let input = document.getElementById("msg")
+    let msg = input.value
 
-if(!msg)return
+    if (!msg) return
 
-let r=
-await fetch(
-"/chat",
-{
+    document.getElementById("chat-box").innerHTML += `
+        <div class="msg">👤 ${msg}</div>
+    `
 
-method:"POST",
+    let res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+    })
 
-headers:{
-"Content-Type":
-"application/json"
-},
+    let data = await res.json()
 
-body:
-JSON.stringify({
-message:msg
-})
+    document.getElementById("chat-box").innerHTML += `
+        <div class="msg">🤖 ${data.reply}</div>
+    `
 
-}
-
-)
-
-let data=
-await r.json()
-
-document
-.getElementById(
-"messages"
-)
-.innerHTML+=
-`
-<div class="bubble">
-
-${data.reply}
-
-</div>
-`
-
-}
-
-async function sendPhoto(){
-
-let file=
-document
-.getElementById(
-"photo"
-)
-.files[0]
-
-if(!file)return
-
-let form=
-new FormData()
-
-form.append(
-"image",
-file
-)
-
-await fetch(
-"/upload",
-{
-
-method:"POST",
-
-body:form
-
-}
-
-)
-
-alert(
-"Photo envoyée"
-)
-
+    input.value = ""
 }
