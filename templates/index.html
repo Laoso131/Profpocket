@@ -33,3 +33,38 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ProfPocket</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>⚡ ProfPocket</h2>
+        <button onclick="newChat()">+ Nouveau chat</button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <div id="chat" class="chat"></div>
+
+        <div class="inputbar">
+            <input id="msg" placeholder="Message..." />
+            <button onclick="send()">➤</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
