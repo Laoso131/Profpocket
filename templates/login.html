@@ -1,121 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
-  <title>Login SaaS</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: radial-gradient(circle at top, #0f172a, #000);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-    }
-
-    .box {
-      width: 340px;
-      padding: 25px;
-      border-radius: 16px;
-      background: rgba(20,20,20,0.85);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      background: linear-gradient(90deg,#00ffcc,#3b82f6);
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    input {
-      width: 90%;
-      padding: 12px;
-      margin: 8px 0;
-      border-radius: 10px;
-      border: 1px solid #333;
-      background: #0a0a0a;
-      color: white;
-      outline: none;
-    }
-
-    button {
-      width: 95%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      background: linear-gradient(135deg,#00ffcc,#3b82f6);
-      font-weight: bold;
-      color: black;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: scale(1.03);
-    }
-
-    #msg {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      opacity: 0;
-      transition: 0.3s;
-    }
-
-    .success {
-      background: rgba(0,255,150,0.1);
-      border: 1px solid #00ff9d;
-      color: #00ff9d;
-      opacity: 1 !important;
-    }
-
-    .error {
-      background: rgba(255,0,80,0.1);
-      border: 1px solid #ff4d6d;
-      color: #ff4d6d;
-      opacity: 1 !important;
-    }
-
-    .small {
-      font-size: 12px;
-      opacity: 0.6;
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>ProfPocket AI - Login</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div class="box">
+<div class="login-container">
 
- <h2>ProfPocket AI</h2>
+  <div class="login-box">
 
-  <input id="username" placeholder="Username">
-  <input id="password" type="password" placeholder="Password">
+    <h2>ProfPocket AI</h2>
 
-  <button onclick="login()">Login</button>
-  <button onclick="register()" style="background:#111;color:white;margin-top:5px;">Register</button>
+    <input id="username" placeholder="Nom d'utilisateur">
+    <input id="password" type="password" placeholder="Mot de passe">
 
-  <div id="msg"></div>
+    <button onclick="login()">Se connecter</button>
+    <button onclick="register()" style="background:#111;margin-top:8px;">
+      Créer un compte
+    </button>
 
-  <div class="small">By continuing you accept the terms</div>
+    <p id="msg" style="margin-top:10px;font-size:14px;"></p>
+
+    <div style="margin-top:15px;font-size:12px;opacity:0.6;">
+      By continuing you accept ProfPocket AI Terms
+    </div>
+
+  </div>
 
 </div>
 
 <script>
 
-function show(msg, type){
+function show(msg, ok){
   let m = document.getElementById("msg")
   m.innerText = msg
-  m.className = type
+  m.style.color = ok ? "#00ff9d" : "#ff4d6d"
 }
 
 async function login(){
@@ -124,21 +47,18 @@ async function login(){
   let p = document.getElementById("password").value
 
   let res = await fetch("/api/login", {
-  method: "POST",
-  headers: {"Content-Type": "application/json"},
-  body: JSON.stringify({
-    username: u,
-    password: p
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({username:u, password:p})
   })
-})
 
   let data = await res.json()
 
   if(data.msg === "ok"){
-    show("✔ Welcome back", "success")
+    show("✔ Connexion réussie", true)
     setTimeout(()=> window.location.href="/", 800)
-  } else {
-    show("✖ Invalid credentials", "error")
+  }else{
+    show("✖ Identifiants incorrects", false)
   }
 }
 
@@ -150,15 +70,15 @@ async function register(){
   let res = await fetch("/register", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({username:u,password:p})
+    body: JSON.stringify({username:u, password:p})
   })
 
   let data = await res.json()
 
   if(data.msg === "created"){
-    show("✔ Account created", "success")
-  } else {
-    show("⚠ User already exists", "error")
+    show("✔ Compte créé", true)
+  }else{
+    show("⚠ Utilisateur déjà existant", false)
   }
 }
 
