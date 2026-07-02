@@ -1,21 +1,24 @@
 async function send() {
 
-  let input = document.getElementById("msg")
-  let msg = input.value
-  if (!msg) return
+  let msg = document.getElementById("msg").value;
+  if (!msg) return;
 
-  addMsg("user", msg)
-  input.value = ""
+  document.getElementById("chat").innerHTML += `<div class="msg"><b>You:</b> ${msg}</div>`;
 
-  let res = await fetch("/chat", {
+  const eventSource = new EventSourcePolyfill("/stream", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({message: msg})
-  })
+    body: JSON.stringify({message: msg}),
+    headers: {"Content-Type": "application/json"}
+  });
 
-  let data = await res.json()
+  let aiBox = document.createElement("div");
+  aiBox.className = "msg";
+  aiBox.innerHTML = "<b>AI:</b> ";
+  document.getElementById("chat").appendChild(aiBox);
 
-  addMsg("bot", data.reply)
+  eventSource.onmessage = function(event) {
+    aiBox.innerHTML += event.data.replaceAll('"','');
+  };
 }
 
 function addMsg(type, text) {
