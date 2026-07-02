@@ -1,4 +1,4 @@
 Flask
 requests
 authlib
-sqlite3
+gunicorn
