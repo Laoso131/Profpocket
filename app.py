@@ -50,7 +50,37 @@ def home():
     return render_template("index.html")
 
 # 🤖 CHAT + SAUVEGARDE
+@app.route("import requests
+from flask import request, jsonify
+
+API_KEY = "TON_API_KEY"
+
+def ai(message):
+
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": "gpt-4o-mini",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Tu es une IA qui peut répondre avec connaissances générales et infos récentes. Réponds comme ChatGPT."
+                },
+                {"role": "user", "content": message}
+            ]
+        }
+    )
+
+    return response.json()["choices"][0]["message"]["content"]
+
 @app.route("/chat", methods=["POST"])
+def chat():
+    msg = request.json.get("message")
+    return jsonify({"reply": ai(msg)})", methods=["POST"])
 def chat():
     msg = request.json.get("message")
     user = session.get("user", "guest")
