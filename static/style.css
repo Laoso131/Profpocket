@@ -1,11 +1,10 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: #0a0a0a;
+  background: #0b0b0b;
   color: white;
 }
 
-/* APP */
 .app {
   display: flex;
   height: 100vh;
@@ -15,18 +14,17 @@ body {
 .sidebar {
   width: 260px;
   background: #111;
-  padding: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-right: 1px solid #222;
 }
 
 .logo {
   font-size: 20px;
-  font-weight: bold;
   color: #00ff9d;
-  margin-bottom: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .sidebar button {
@@ -34,22 +32,20 @@ body {
   border: 1px solid #333;
   color: white;
   padding: 10px;
-  cursor: pointer;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .sidebar button:hover {
   border-color: #00ff9d;
 }
 
-/* PREMIUM BOX */
 .premium {
   margin-top: auto;
-  padding: 15px;
+  padding: 10px;
   background: linear-gradient(45deg, #00ff9d, #00b3ff);
   color: black;
   border-radius: 10px;
-  font-weight: bold;
 }
 
 /* MAIN */
@@ -57,13 +53,6 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-/* TOP BAR */
-.topbar {
-  padding: 15px;
-  border-bottom: 1px solid #222;
-  background: #0f0f0f;
 }
 
 /* CHAT */
@@ -74,17 +63,15 @@ body {
 }
 
 .msg {
-  max-width: 70%;
-  padding: 12px;
+  padding: 10px;
   margin: 10px 0;
-  border-radius: 12px;
-  line-height: 1.4;
+  border-radius: 10px;
+  max-width: 70%;
 }
 
 .user {
   background: #1f1f1f;
   margin-left: auto;
-  border: 1px solid #333;
 }
 
 .bot {
@@ -95,9 +82,8 @@ body {
 /* INPUT */
 .inputbar {
   display: flex;
-  padding: 15px;
+  padding: 10px;
   border-top: 1px solid #222;
-  background: #0f0f0f;
 }
 
 input {
@@ -111,14 +97,9 @@ input {
 
 button {
   margin-left: 10px;
-  padding: 12px 18px;
   background: #00ff9d;
   border: none;
+  padding: 12px 18px;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover {
-  background: #00d98c;
 }
