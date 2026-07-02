@@ -19,6 +19,14 @@ def init_db():
     )
     """)
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT,
+        message TEXT
+    )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -40,10 +48,10 @@ def register():
         c.execute("INSERT INTO users (username, password) VALUES (?,?)", (u, p))
         conn.commit()
     except:
+        conn.close()
         return jsonify({"msg": "exists"})
 
     conn.close()
-
     return jsonify({"msg": "created"})
 
 # ======================
@@ -78,11 +86,19 @@ def logout():
     return redirect("/login")
 
 # ======================
-# PROTECTED HOME
+# PROTECTION ROUTE
+# ======================
+def require_login():
+    if "user" not in session:
+        return False
+    return True
+
+# ======================
+# HOME
 # ======================
 @app.route("/")
 def home():
-    if "user" not in session:
+    if not require_login():
         return redirect("/login")
 
     return render_template("index.html", user=session["user"])
@@ -95,15 +111,82 @@ def login_page():
     return render_template("login.html")
 
 # ======================
-# REGISTER PAGE SIMPLE
+# REGISTER PAGE
 # ======================
 @app.route("/register-page")
 def register_page():
     return render_template("register.html")
-@app.route("/")
-def home():
-    if "user" not in session:
-        return redirect("/login")
-    return render_template("index.html", user=session["user"])
+
+# ======================
+# 🧠 IA CORE (AMÉLIORÉE)
+# ======================
+def ai_engine(msg):
+
+    msg = msg.lower()
+
+    # maths
+    if "derive" in msg or "dérivé" in msg:
+        return "📘 f(x)=x² → f'(x)=2x"
+
+    # physics
+    if "physique" in msg:
+        return "⚡ F = m × a"
+
+    # chimie
+    if "chimie" in msg:
+        return "🧪 H2 + O2 → H2O"
+
+    # coding
+    if "code" in msg:
+        return "💻 Je peux t'aider en Python, JS, HTML, Flask"
+
+    # general smart fallback
+    return "🤖 NeoAI (beta): réponse générée localement. Bientôt connexion IA cloud."
+
+# ======================
+# CHAT IA + SAVE MESSAGE
+# ======================
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    if not require_login():
+        return jsonify({"reply": "❌ not logged in"})
+
+    data = request.get_json()
+    msg = data.get("message")
+
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+
+    c.execute("INSERT INTO messages (user, message) VALUES (?,?)", (session["user"], msg))
+    conn.commit()
+    conn.close()
+
+    reply = ai_engine(msg)
+
+    return jsonify({"reply": reply})
+
+# ======================
+# HISTORY (BASE SAAS FEATURE)
+# ======================
+@app.route("/history")
+def history():
+
+    if not require_login():
+        return jsonify([])
+
+    conn = sqlite3.connect("db.db")
+    c = conn.cursor()
+
+    c.execute("SELECT message FROM messages WHERE user=?", (session["user"],))
+    data = c.fetchall()
+
+    conn.close()
+
+    return jsonify([d[0] for d in data])
+
+# ======================
+# RUN
+# ======================
 if __name__ == "__main__":
     app.run(debug=True)
